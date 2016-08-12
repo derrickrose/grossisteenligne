@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.5.0.2
+-- version 4.5.1
 -- http://www.phpmyadmin.net
 --
 -- Client :  127.0.0.1
--- G�n�r� le :  Mer 06 Juillet 2016 � 10:30
--- Version du serveur :  10.0.17-MariaDB
--- Version de PHP :  5.6.14
+-- Généré le :  Ven 12 Août 2016 à 18:56
+-- Version du serveur :  10.1.13-MariaDB
+-- Version de PHP :  5.6.23
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,17 +17,17 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de donn�es :  `crawl`
+-- Base de données :  `crawl`
 --
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `wordans`
+-- Structure de la table `grossiste`
 --
 
-CREATE TABLE `wordans` (
-  `productId` varchar(15) NOT NULL,
+CREATE TABLE `grossiste` (
+  `productId` varchar(75) NOT NULL,
   `Name` varchar(255) NOT NULL,
   `link` varchar(600) NOT NULL,
   `image` varchar(600) NOT NULL,
@@ -43,13 +43,13 @@ CREATE TABLE `wordans` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
--- Index pour les tables export�es
+-- Index pour les tables exportées
 --
 
 --
--- Index pour la table `wordans`
+-- Index pour la table `grossiste`
 --
-ALTER TABLE `wordans`
+ALTER TABLE `grossiste`
   ADD PRIMARY KEY (`productId`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
