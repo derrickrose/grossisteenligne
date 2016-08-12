@@ -38,7 +38,7 @@ public class FirstVersionIHM extends JFrame {
    }
 
    public static void main(String[] args) {
-	   System.setProperty("jsse.enableSNIExtension", "true");
+      System.setProperty("jsse.enableSNIExtension", "true");
       try {
          UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
       } catch (ClassNotFoundException e) {
@@ -58,7 +58,7 @@ public class FirstVersionIHM extends JFrame {
       SwingUtilities.invokeLater(new Runnable() {
          @Override
          public void run() {
-            FirstVersionIHM fvihm = new FirstVersionIHM("Wordans crawler");
+            FirstVersionIHM fvihm = new FirstVersionIHM("Grossiste crawler");
             fvihm.setOpacity((float) 0.0);
          }
       });

@@ -18,7 +18,7 @@ import com.pushtech.crawler.launcher.DataBaseUpdaterHelper.UpdateWay;
 
 public class ProductDAO extends AbstractDAOEntity {
 
-   private static final String TABLE_NAME = "wordans";
+   private static final String TABLE_NAME = "grossiste";
    private static final String INSERT_REQUEST = initInsertRequest();
    private static final String READ_REQUEST = initReadRequest();
    private static final String SEARCH_REQUEST = initSearchRequest();

@@ -10,20 +10,10 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.PeriodFormat;
-import org.joda.time.format.PeriodFormatter;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import com.pushtech.commons.Product;
-import com.pushtech.commons.SpecialChar;
 import com.pushtech.crawler.beans.Page;
 
 public class CrawlOffer {
@@ -33,7 +23,13 @@ public class CrawlOffer {
 
       Product product = new Product();
       final Document productPageDocument = page.getDoc();
-
+      String productId = null;
+      try {
+         productId = getProductId(productPageDocument);
+      } catch (Exception e1) {
+         logger.error(e1.getMessage() + " on " + page.getUrl());
+      }
+      product.setId(productId);
       String name = null;
       try {
          name = getName(productPageDocument);
@@ -88,7 +84,7 @@ public class CrawlOffer {
       product.setKeyWord(strKeyWord);
       logger.debug("KeyWord : " + strKeyWord);
 
-      float shippingCost = -1f;
+      float shippingCost = getShippingCost(productPageDocument);
       product.setShippingCost(shippingCost);
       logger.debug("Shipping cost : " + shippingCost);
 
@@ -109,33 +105,13 @@ public class CrawlOffer {
       return product;
    }
 
-   private String getProductId(final Document productPageDocument) throws Exception {
-      final Elements productIdElements = productPageDocument.select(Selectors.PRODUCT_IDENTIFIER);
+   public String getProductId(final Document productPageDocument) throws Exception {
+      final Element productIdElement = productPageDocument.select(Selectors.PRODUCT_IDENTIFIER).first();
       String productIdRaw = null;
-      for (Element element : productIdElements) {
-         productIdRaw = element.text();
-         if (productIdRaw.contains("rticle")) {
-            break;
-         }
+      if (productIdElement != null) {
+         productIdRaw = productIdElement.text();
       }
-      // TODO
-      String productId = productIdRaw;
-      productId = validateField(productId, "Product Id");
-      productId = productId.replace("Cod. Article ", "").trim();
-      return productId.replaceAll("[^\\d]", "");
-   }
-
-   public static String getProductIdFromLink(final String link) throws Exception {
-      String productId = null;
-      if (StringUtils.isNotEmpty(link)) {
-         productId = link;
-         productId = link.substring(link.lastIndexOf("-") + 1);
-         if (!productId.matches("\\d+")) {
-            logger.error("Invalid productId : |" + productId + "| set to null");
-            productId = null;
-         }
-      }
-      return productId;
+      return productIdRaw;
    }
 
    // example
@@ -155,7 +131,7 @@ public class CrawlOffer {
 
    private String getDescription(final Document productPageDocument) throws Exception {
       final Element descriptionElement = findElement(productPageDocument, Selectors.PRODUCT_DESCRIPTION); // TODO
-      String description = fromElementText(descriptionElement);
+      String description = fromAttribute(descriptionElement, "content");
       description = validateField(description, "Description");
       return description;
    }
@@ -182,12 +158,11 @@ public class CrawlOffer {
    }
 
    private String cleanCategory(String category) {
-      // if (category != null && category.contains(">")) {
-      // category = category.substring(category.lastIndexOf(">") + 1).trim();
-      // // category = category.substring(0,category.indexOf(" ")).trim();
-      // return category;
-      // } else
-      return category != null ? category.trim() : null;
+      if (category != null && category.contains(">")) {
+         category = category.substring(category.lastIndexOf(">") + 1).trim();
+         category = category.substring(0, category.indexOf(" ")).trim();
+         return category;
+      } else return category != null ? category.trim() : null;
    }
 
    private String getImage(final Document productPageDocument) throws Exception {
@@ -200,17 +175,16 @@ public class CrawlOffer {
 
    private float getPrice(final Element element) {
       final Element priceElement = findElement(element, Selectors.PRODUCT_PRICE);
-      String priceRaw = priceElement.text();
+      String priceRaw = fromAttribute(priceElement, "data-exact-price");
       priceRaw = validateField(priceRaw, "Price", 1);
       return parseLocalizedPrice(priceRaw.replace(".", ","));
    }
 
    private float getShippingCost(final Element element) {
-      // final Element shippingCostElement = findElement(element, Selectors.PRODUCT_SHIPPING_COST);// TODO
-      // String ShippingCostRaw = fromElementText(shippingCostElement);
-      // ShippingCostRaw = validateField(ShippingCostRaw, "Shipping price", 0);
-      // return parseLocalizedPrice(ShippingCostRaw);
-      return -1f;
+      final Element shippingCostElement = findElement(element, Selectors.PRODUCT_SHIPPING_COST);// TODO
+      String ShippingCostRaw = fromElementText(shippingCostElement);
+      ShippingCostRaw = validateField(ShippingCostRaw, "Shipping price", 0);
+      return parseLocalizedPrice(ShippingCostRaw);
    }
 
    private int getQuantity(final Element element) throws Exception {
@@ -227,33 +201,27 @@ public class CrawlOffer {
 
    private int getShippingDelay(final String delayRaw) {// TODO
       if (StringUtils.isNotBlank(delayRaw)) {
-         final String lcRawDelivery = StringUtils.lowerCase(delayRaw);
-         final DateTime when = parseLocalizedDeliveryDate(lcRawDelivery);
-         if (when != null) {
-            int delivery = getDeliveryDaysBetween(DateTime.now(), when);
-            // if (delivery == 0) {
-            // return 1;
-            // }
-            return delivery;
+         String lcRawDelivery = StringUtils.lowerCase(delayRaw);
+         lcRawDelivery = StringUtils.substringBeforeLast(delayRaw, ",");
+         Pattern p = Pattern.compile("(\\d+)\\sjour");
+         Matcher m = p.matcher(lcRawDelivery);
+         if (m.find()) {
+            return Integer.parseInt(m.group(1));
+         } else {
+            logger.error("Delay not parseable [" + delayRaw + "]");
          }
+
       }
       return 0;
    }
 
    private String getShippingDelayRaw(final Element element) {
-      Element shippingDelayElement = findElement(element, Selectors.PRODUCT_DELIVERY);// TODO
+      Element shippingDelayElement = findElement(element, Selectors.PRODUCT_DELIVERY);
+      if (shippingDelayElement != null) return "0";
+      shippingDelayElement = findElement(element, "strong.inStock");
       String shippingDelayRaw = fromElementText(shippingDelayElement);
       shippingDelayRaw = validateField(shippingDelayRaw, "Raw delivery", 1);
       return shippingDelayRaw;
-   }
-
-   private int getDeliveryDaysBetween(final DateTime reference, final DateTime when) {
-      return Days.daysBetween(reference, when).getDays();
-   }
-
-   private String cleanDeliveryToGetParseableDate(final String rawDelivery) {
-      // TODO
-      return StringUtils.trim(rawDelivery);
    }
 
    private String fromAttribute(final Element element, final String attr) {
@@ -263,78 +231,6 @@ public class CrawlOffer {
          return StringUtils.trim(text);
       }
       return null;
-   }
-
-   // private DateTime parseLocalizedDeliveryDate(final String rawDelivery, final String url) {
-   // if (isExpressedAsPeriod(rawDelivery)) { // Ex : rawDelivery -> "livraison sous 5 jours"
-   // return parseLocalizedPeriodDelivery(rawDelivery);
-   // }
-   // if (isExpressedAsDate(rawDelivery)) { // Ex : rawDelivery -> "date de livraison : 02-05-2016"
-   // return parseLocalizedDateDelivery(rawDelivery);
-   // }
-   // logger.error("New form of raw delivery found [" + rawDelivery + "]");
-   // return null;
-   // }
-
-   private DateTime parseLocalizedDeliveryDate(final String rawDelivery) {
-      if (isExpressedAsPeriod(rawDelivery)) {
-         return parseLocalizedPeriodDelivery(rawDelivery);
-      }
-      if (isExpressedAsDate(rawDelivery)) { // Ex : rawDelivery -> "date de livraison : 02-05-2016"
-         return parseLocalizedDateDelivery(rawDelivery);
-      }
-      logger.error("New form of raw delivery found [" + rawDelivery + "]");
-      return null;
-   }
-
-   private DateTime parseLocalizedDateDelivery(String rawDelivery) {
-      final String delivery = cleanDeliveryToGetParseableDate(rawDelivery); // Ex : delivery -> "02-10-2016"
-      try {
-         final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd-MM-yyyy").withLocale(CURRENT_LOCALE); // TODO
-         final LocalDateTime localDateTime = LocalDateTime.parse(delivery, dateTimeFormatter);
-         return localDateTime.toDateTime().plusDays(1);
-      } catch (Exception exc) {
-         logger.error("Delivery date not parseable [" + delivery + "]");
-         // conn.debug(ExceptionUtils.getStackTrace(exc));
-      }
-      return null;
-   }
-
-   private DateTime parseLocalizedPeriodDelivery(final String rawDelivery) {
-      String delivery = cleanDeliveryToGetParseablePeriodText(rawDelivery); // Ex : delivery -> "2 semaines"
-      if (delivery.matches("\\d+h")) {
-         delivery = "" + Integer.parseInt(delivery.replaceAll("[^\\d]", "")) / 24 + " jours";
-      }
-      try {
-         final PeriodFormatter periodFormatter = PeriodFormat.wordBased(CURRENT_LOCALE);
-         final Period period = periodFormatter.parsePeriod(delivery);
-         return new DateTime().plus(period).plusHours(5);
-
-      } catch (Exception exc) {
-         logger.error("Delivery period not parseable [" + delivery + "]");
-         // conn.debug(ExceptionUtils.getStackTrace(exc));
-      }
-      return null;
-   }
-
-   private String cleanDeliveryToGetParseablePeriodText(String rawDelivery) {
-      // TODO
-      if (rawDelivery.contains(SpecialChar.FRENCH_PREPOSITION_A)) {
-         rawDelivery = rawDelivery.substring(rawDelivery.indexOf(SpecialChar.FRENCH_PREPOSITION_A));
-      }
-      Matcher matcher = Pattern.compile("\\d+\\s*\\p{L}+").matcher(rawDelivery); // TODO
-      if (matcher.find()) {
-         return matcher.group(0);
-      }
-      return null;
-   }
-
-   private boolean isExpressedAsDate(final String rawDelivery) {
-      return StringUtils.contains(rawDelivery, "%Delivery date identifier%"); // TODO
-   }
-
-   private boolean isExpressedAsPeriod(final String rawDelivery) {
-      return StringUtils.endsWith(rawDelivery, "h"); // TODO
    }
 
    private float parseLocalizedPrice(final String priceRaw) {
@@ -354,8 +250,7 @@ public class CrawlOffer {
    }
 
    private String cleanPrice(final String priceRaw) {
-      // TODO
-      return priceRaw.replaceAll("[^\\d.,]", "");
+      return priceRaw.replaceAll("[^\\d.,]", "").replace(".", ",");
    }
 
    private Element findElement(final Element element, final String cssSelector) {

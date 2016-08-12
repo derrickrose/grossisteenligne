@@ -1,7 +1,6 @@
 package com.pushtech.crawler.launcher;
 
 import static com.pushtech.crawler.launcher.CrawlListing.getNextPageLink;
-import static com.pushtech.crawler.launcher.CrawlOffer.getProductIdFromLink;
 import static com.pushtech.crawler.logging.LoggingHelper.logger;
 
 import java.util.ArrayList;
@@ -68,7 +67,7 @@ public class Crawl {
       HttpResponse response = null;
       HashMap<String, String> headers = new HashMap<String, String>();
 
-      headers.put("Host", "www.wordans.fr");
+      headers.put("Host", "www.grossiste-en-ligne.com");
       headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0");
 
       response = ConnectionHandler.getResponse(url, null, headers, methodeType);
@@ -80,13 +79,7 @@ public class Crawl {
    private void offerCrawling(Page page, String productPath) {
       Product product = new CrawlOffer().doAction(page);
       System.out.println("Link : " + productPath);
-
-      String productId = null;
-      try {
-         productId = getProductIdFromLink(productPath);
-      } catch (Exception e) {
-         logger.error("Error on getting Id from link");
-      }
+      String productId = product.getId();
       logger.debug("Product Id : " + productId);
       product.setId(productId);
 
