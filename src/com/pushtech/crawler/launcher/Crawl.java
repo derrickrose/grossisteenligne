@@ -5,11 +5,15 @@ import static com.pushtech.crawler.logging.LoggingHelper.logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import org.apache.http.HttpResponse;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.pushtech.commons.Product;
 import com.pushtech.crawler.beans.Page;
@@ -85,9 +89,44 @@ public class Crawl {
 
       product.setLink(productPath);
       product.setId(productId);
-      DAOFactory daoFactory = new DataBaseDAO().getFactoryInstance();
-      AbstractDAOEntity daoEntity = new ProductDAO(daoFactory);
-      daoEntity.updateEntity(product);
+      for (Product p : getVariantes(page.getDoc(), product)) {
+         DAOFactory daoFactory = new DataBaseDAO().getFactoryInstance();
+         AbstractDAOEntity daoEntity = new ProductDAO(daoFactory);
+         daoEntity.updateEntity(p);
+      }
+   }
+
+   private List<Product> getVariantes(Document docProduct, Product p) {
+      List<Product> products = new ArrayList<Product>();
+      Elements lists = docProduct.select(Selectors.PRODUCT_VARIANTE);
+      System.out.println("Variante size list:" + lists.size());
+      if (lists.size() > 0) {
+         for (Element productElement : lists) {
+            Product variantProduct = new Product();
+            String strVariantSize = productElement.text();
+            System.out.println("Variant size Name :" + strVariantSize);
+            variantProduct.setBrand(strVariantSize);
+            variantProduct.setName(p.getName());
+            variantProduct.setId(p.getId() + "-" + strVariantSize);
+            variantProduct.setDescription(p.getDescription());
+            variantProduct.setKeyWord(p.getKeyWord());
+            variantProduct.setPrice(p.getPrice());
+            variantProduct.setCategory(p.getCategory());
+            variantProduct.setShippingDelay(p.getShippingDelay());
+            variantProduct.setQuantity(10);
+            variantProduct.setParentId(p.getId());
+            variantProduct.setImage(p.getImage());
+            variantProduct.setUpdated(p.getUpdated());
+            variantProduct.setLink(p.getLink());
+            products.add(variantProduct);
+
+         }
+
+      } else {
+         // SANS VARIANTE
+         products.add(p);
+      }
+      return products;
    }
 
    private void homeCrawling(Page homePage) {

@@ -240,7 +240,7 @@ public class CrawlOffer {
          try {
             NumberFormat priceFormat = NumberFormat.getNumberInstance(CURRENT_LOCALE);
             Number priceNumber = priceFormat.parse(priceText);
-            // return (float) (priceNumber.floatValue() * (1 + (19.8 / 100)));
+            // return (float) (priceNumber.floatValue() * (1.2)));
             return priceNumber.floatValue();
          } catch (ParseException pexc) {
             logger.error("Price number not parseable [" + priceText + "]");
@@ -294,7 +294,7 @@ public class CrawlOffer {
 
    private static String cleanPath(String path) {
       if (!StringUtils.startsWith(path, "http:")) {
-         return "http://www.alcodistributions.fr" + path;
+         return "http://www.grossiste-en-ligne.com" + path;
       }
       return path;
    }
