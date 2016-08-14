@@ -1,15 +1,28 @@
 package com.pushtech.commons;
 
+import java.util.List;
+
 public class Product implements Cloneable {
 
    private String id = null, parentId = null;
-   private String name = null, link = null, description = null, brand = null, category = null, image = null;
+   private String reference = null;
+   private String name = null, link = null, description = null, shortDescription = null, brand = null, category = null, image = null;
+
+   public String getReference() {
+      return reference;
+   }
+
+   public void setReference(String reference) {
+      this.reference = reference;
+   }
+
    private String keyWord = null;
    private String updated = null;
    private float price = -1f, shippingCost = -1f, previousPrice = -1;
    private int shippingDelay = 0, quantity = 0;
    private String colorName = null;
    private String SizeName = null;
+   private List<String> images = null;
 
    public String getColorName() {
       return colorName;
@@ -17,6 +30,22 @@ public class Product implements Cloneable {
 
    public void setColorName(String colorName) {
       this.colorName = colorName;
+   }
+
+   public String getShortDescription() {
+      return shortDescription;
+   }
+
+   public void setShortDescription(String shortDescription) {
+      this.shortDescription = shortDescription;
+   }
+
+   public List<String> getImages() {
+      return images;
+   }
+
+   public void setImages(List<String> images) {
+      this.images = images;
    }
 
    public String getSizeName() {

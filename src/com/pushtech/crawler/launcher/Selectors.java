@@ -6,10 +6,12 @@ public class Selectors {
    public static final String PRODUCT_PAGE_IDENTIFIER = "div.productViewContent";
    public static final String PRODUCT_NAME = ".productName.noBg>span";
    public static final String PRODUCT_LINK = "head > link";
+   public static final String PRODUCT_SHORT_DESCRIPTION = "div[itemprop=description]";
    public static final String PRODUCT_DESCRIPTION = "meta[name=Description]";
    public static final String PRODUCT_BRAND = "";
    public static final String PRODUCT_KEYWORDS = "meta[name=keywords]";
    public static final String PRODUCT_IDENTIFIER = ".item_submit_button";
+   public static final String PRODUCT_REFERENCE = "span.sku";
    public static final String PRODUCT_CATEGORY = ".crumb0>a";// listing
    public static final String PRODUCT_IMAGE = ".slide > img";
    public static final String PRODUCT_PRICE = "#articlePrice.price >span > span#price";

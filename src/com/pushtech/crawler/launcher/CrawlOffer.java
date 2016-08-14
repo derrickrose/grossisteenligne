@@ -4,6 +4,8 @@ import static com.pushtech.crawler.logging.LoggingHelper.logger;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +14,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import com.pushtech.commons.Product;
 import com.pushtech.crawler.beans.Page;
@@ -33,6 +36,17 @@ public class CrawlOffer {
 
       product.setId(productId);
       product.setParentId(productId);
+
+      String reference = null;
+      try {
+         reference = getReference(productPageDocument);
+      } catch (Exception e1) {
+         logger.error(e1.getMessage() + " on " + page.getUrl());
+      }
+      logger.debug("Reference : " + reference);
+
+      product.setReference(reference);
+
       String name = null;
       try {
          name = getName(productPageDocument);
@@ -50,6 +64,15 @@ public class CrawlOffer {
       }
       product.setDescription(description);
       logger.debug("Description : " + description);
+
+      String shortDescription = null;
+      try {
+         shortDescription = getShortDescription(productPageDocument);
+      } catch (Exception e) {
+         logger.error(e.getMessage() + " on " + page.getUrl());
+      }
+      product.setShortDescription(shortDescription);
+      logger.debug("Short description : " + shortDescription);
 
       String brand = "";
       product.setBrand(brand);
@@ -72,6 +95,14 @@ public class CrawlOffer {
       }
       product.setImage(image);
       logger.debug("Image : " + image);
+
+      List<String> imagesList = null;
+      try {
+         imagesList = getImages(image, productPageDocument);
+      } catch (Exception e) {
+         logger.error(e.getMessage() + " on " + page.getUrl());
+      }
+      product.setImages(imagesList);
 
       float price = -1f;
       try {
@@ -117,6 +148,15 @@ public class CrawlOffer {
       return productIdRaw;
    }
 
+   public String getReference(final Document productPageDocument) throws Exception {
+      final Element referenceElement = productPageDocument.select(Selectors.PRODUCT_REFERENCE).first();
+      String referenceRaw = null;
+      if (referenceElement != null) {
+         referenceRaw = referenceElement.text();
+      }
+      return referenceRaw;
+   }
+
    // example
    private String getName(final Document productPageDocument) throws Exception {
       final Element nameElement = findElement(productPageDocument, Selectors.PRODUCT_NAME); // TODO
@@ -130,6 +170,13 @@ public class CrawlOffer {
       String link = fromAttribute(linkElement, "href");
       link = validateField(link, "Link");
       return link;
+   }
+
+   private String getShortDescription(final Document productPageDocument) throws Exception {
+      final Element descriptionElement = findElement(productPageDocument, Selectors.PRODUCT_SHORT_DESCRIPTION); // TODO
+      String description = descriptionElement.text();
+      description = validateField(description, "Short Description");
+      return description;
    }
 
    private String getDescription(final Document productPageDocument) throws Exception {
@@ -174,6 +221,22 @@ public class CrawlOffer {
       image = validateField(image, "Image");
       image = cleanPath(image);
       return image;
+   }
+
+   private List<String> getImages(final String firstImage, final Document productPageDocument) throws Exception {
+      final Elements imageElements = findElements(productPageDocument, Selectors.PRODUCT_IMAGE);
+      System.out.println("Images " + imageElements.size());
+      List<String> imagesList = new ArrayList<String>();
+      String image = null;
+      for (Element element : imageElements) {
+         image = cleanPath(fromAttribute(element, "src"));
+         if (image.equals(firstImage)) {
+            image = "";
+         }
+         if (imagesList.size() == 6) break;
+         imagesList.add(image);
+      }
+      return imagesList;
    }
 
    private float getPrice(final Element element) {
@@ -258,6 +321,10 @@ public class CrawlOffer {
 
    private Element findElement(final Element element, final String cssSelector) {
       return element.select(cssSelector).first();
+   }
+
+   private Elements findElements(final Element element, final String cssSelector) {
+      return element.select(cssSelector);
    }
 
    private String fromElementText(final Element element) {

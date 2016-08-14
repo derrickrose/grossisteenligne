@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -63,13 +65,13 @@ public class ProductDAO extends AbstractDAOEntity {
       int status = 0;
       try {
          connection = daoFactory.getConnection();
-         preparedStatement = initPreparedRequest(connection, INSERT_REQUEST, true, product.getId(), validate(product.getName()), validate(product.getLink()), validate(product.getImage()), validate(product.getDescription()), validate(product.getKeyWord()), product.getPrice(), product.getShippingCost(), product.getShippingDelay(), validate(product.getBrand()), validate(product.getCategory()), product.getQuantity(), getNowDate(), validate(product.getParentId()), validate(product.getColorName()), validate(product.getSizeName()));
+         preparedStatement = initPreparedRequest(connection, INSERT_REQUEST, true, product.getId(), validate(product.getName()), validate(product.getLink()), validate(product.getImage()), validate(product.getDescription()), validate(product.getKeyWord()), product.getPrice(), product.getShippingCost(), product.getShippingDelay(), validate(product.getBrand()), validate(product.getCategory()), product.getQuantity(), getNowDate(), validate(product.getParentId()), validate(product.getColorName()), validate(product.getSizeName()), product.getImages(), product.getReference(), product.getShortDescription());
          status = preparedStatement.executeUpdate();
          if (status == 0) {
             logger.error("Save product failed : " + product.getId() + " - " + product.getLink());
          } else logger.debug("Save product passed");
       } catch (Exception e) {
-         logger.error(e.getMessage());
+         logger.error(e.getMessage() + "" + e.getStackTrace());
       }
 
       finally {
@@ -92,16 +94,29 @@ public class ProductDAO extends AbstractDAOEntity {
 
    public static PreparedStatement initPreparedRequest(Connection connection, String request, boolean returnGeneratedKeys, Object... objects) throws SQLException {
       PreparedStatement preparedStatement = connection.prepareStatement(request, returnGeneratedKeys ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
-      for (int i = 0; i < objects.length; i++) {
-         preparedStatement.setObject(i + 1, objects[i]);
+      List<String> images = null;
+      int indexMysql = 1;
+      for (int indexOject = 0; indexOject < objects.length; indexOject++) {
+         if (objects[indexOject] instanceof List) {
+            images = (List<String>) objects[indexOject];
+            System.out.println("Suize " + images.size());
+            for (Object object : images) {
+               preparedStatement.setObject(indexMysql, object);
+               indexMysql++;
+            }
+         } else {
+            preparedStatement.setObject(indexMysql, objects[indexOject]);
+            indexMysql++;
+         }
       }
       return preparedStatement;
    }
 
    private Product mapper(ResultSet resultSet) throws SQLException {
       Product product = new Product();
+      List<String> images = new ArrayList<String>();
       product.setId(resultSet.getString("productId"));
-      // product.setParentId(resultSet.getString( "parentid" ) );
+      product.setReference(resultSet.getString("reference"));
       product.setName(resultSet.getString("Name"));
       product.setLink(resultSet.getString("link"));
       product.setDescription(resultSet.getString("description"));
@@ -117,7 +132,14 @@ public class ProductDAO extends AbstractDAOEntity {
       product.setParentId(resultSet.getString("parent_id"));//
       product.setColorName(resultSet.getString("color_name"));//
       product.setSizeName(resultSet.getString("size_name"));//
-
+      product.setShortDescription(resultSet.getString("short_description"));//
+      images.add(resultSet.getString("image1"));
+      images.add(resultSet.getString("image2"));
+      images.add(resultSet.getString("image3"));
+      images.add(resultSet.getString("image4"));
+      images.add(resultSet.getString("image5"));
+      images.add(resultSet.getString("image6"));
+      product.setImages(images);
       return product;
    }
 
@@ -128,9 +150,9 @@ public class ProductDAO extends AbstractDAOEntity {
 
    private static String initInsertRequest() {
       String insertRequest = "INSERT INTO " + TABLE_NAME + " ";
-      insertRequest += "(productId, Name, link, image, description, motclef, price, shippingCost, shippingDealy, brand, category, quantity, update_time,parent_id,color_name,size_name)";
+      insertRequest += "(productId, Name, link, image, description, motclef, price, shippingCost, shippingDealy, brand, category, quantity, update_time,parent_id,color_name,size_name,image1,image2,image3,image4,image5,image6,reference,short_description)";
 
-      insertRequest += "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+      insertRequest += "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
       return insertRequest;
    }
 
@@ -151,6 +173,14 @@ public class ProductDAO extends AbstractDAOEntity {
       updateRequest += " , " + "parent_id = ?";
       updateRequest += " , " + "color_name = ?";
       updateRequest += " , " + "size_name = ?";
+      updateRequest += " , " + "image1 = ?";
+      updateRequest += " , " + "image2 = ?";
+      updateRequest += " , " + "image3 = ?";
+      updateRequest += " , " + "image4 = ?";
+      updateRequest += " , " + "image5 = ?";
+      updateRequest += " , " + "image6 = ?";
+      updateRequest += " , " + "reference = ?";
+      updateRequest += " , " + "short_description = ?";
       updateRequest += " WHERE productId = ? ";
       return updateRequest;
    }
@@ -169,7 +199,7 @@ public class ProductDAO extends AbstractDAOEntity {
             DataBaseUpdaterHelper dbuh = DataBaseUpdaterHelper.getUpdaterMode(true, UpdateWay.SIMPLE_UPDATE);
             product = dbuh.updateProduct(siteProduct, databaseProduct);
             connection = daoFactory.getConnection();
-            updateStatement = initPreparedRequest(connection, UPDATE_REQUEST, true, product.getName(), product.getLink(), product.getImage(), product.getDescription(), product.getKeyWord(), product.getPrice(), product.getShippingCost(), product.getShippingDelay(), product.getBrand(), product.getCategory(), product.getQuantity(), getNowDate(), validate(product.getParentId()), validate(product.getColorName()), validate(product.getSizeName()), product.getId());
+            updateStatement = initPreparedRequest(connection, UPDATE_REQUEST, true, product.getName(), product.getLink(), product.getImage(), product.getDescription(), product.getKeyWord(), product.getPrice(), product.getShippingCost(), product.getShippingDelay(), product.getBrand(), product.getCategory(), product.getQuantity(), getNowDate(), validate(product.getParentId()), validate(product.getColorName()), validate(product.getSizeName()), product.getImages(), product.getReference(), product.getShortDescription(), product.getId());
             status = updateStatement.executeUpdate();
             if (status != 0) logger.debug("Update passed");
             else logger.error("Update failed : " + product.getId() + " - " + product.getLink());

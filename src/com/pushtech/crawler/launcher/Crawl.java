@@ -136,6 +136,7 @@ public class Crawl {
             variantProduct.setUpdated(p.getUpdated());
             variantProduct.setLink(p.getLink());
             variantProduct.setSizeName(strVariantSize);
+            variantProduct.setImages(p.getImages());
             products.add(variantProduct);
 
          }
