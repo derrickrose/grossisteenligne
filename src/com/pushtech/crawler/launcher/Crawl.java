@@ -130,7 +130,6 @@ public class Crawl {
             variantProduct.setPrice(p.getPrice());
             variantProduct.setCategory(p.getCategory());
             variantProduct.setShippingDelay(p.getShippingDelay());
-            variantProduct.setQuantity(10);
             variantProduct.setParentId(p.getId());
             variantProduct.setImage(p.getImage());
             variantProduct.setUpdated(p.getUpdated());
