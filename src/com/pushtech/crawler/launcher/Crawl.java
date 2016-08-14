@@ -113,11 +113,12 @@ public class Crawl {
             }
 
             if (strVariantSize.contains("Taille")) {
-               strVariantSize = strVariantSize.substring(strVariantSize.indexOf("Taille") + "Taille".length()).trim();
+               strVariantSize = (strVariantSize.substring(strVariantSize.indexOf("Taille") + "Taille".length())).replace(":", "").trim();
+
             }
 
             logger.debug("Color name : " + colorName);
-            System.out.println("Variant size Name :" + strVariantSize);
+            System.out.println("Variant size Name : " + strVariantSize);
             variantProduct.setBrand(p.getBrand());
             variantProduct.setName(p.getName());
             variantProduct.setId(p.getId() + "-" + strVariantSize);
