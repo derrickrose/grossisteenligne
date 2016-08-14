@@ -5,8 +5,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
-import liquibase.util.StreamUtil;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -17,8 +15,10 @@ import org.jsoup.nodes.Document;
 
 import com.pushtech.crawler.beans.Page;
 
+import liquibase.util.StreamUtil;
+
 public class PageParser implements ParsingTemplate {
-	
+
    protected PageParser() {
 
    }
@@ -61,17 +61,17 @@ public class PageParser implements ParsingTemplate {
             return StringUtils.trim(content);
          }
       }
-      return StringUtils.trim(EntityUtils.toString(response.getEntity(), "iso-8859-1"));
+      return StringUtils.trim(EntityUtils.toString(response.getEntity(), "utf-8"));
    }
 
    private Document getDocument(String content) {
       return Jsoup.parse(content);
    }
 
-@Override
-public ParsingTemplate getAppropriateParsingTemplate(Object object) {
-	// TODO Auto-generated method stub
-	return null;
-}
+   @Override
+   public ParsingTemplate getAppropriateParsingTemplate(Object object) {
+      // TODO Auto-generated method stub
+      return null;
+   }
 
 }
