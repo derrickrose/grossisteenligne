@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Client :  127.0.0.1
--- Généré le :  Ven 12 Août 2016 à 18:56
+-- Généré le :  Dim 14 Août 2016 à 11:18
 -- Version du serveur :  10.1.13-MariaDB
 -- Version de PHP :  5.6.23
 
@@ -23,11 +23,11 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Structure de la table `grossiste`
+-- Structure de la table `grossisteenligne`
 --
 
-CREATE TABLE `grossiste` (
-  `productId` varchar(75) NOT NULL,
+CREATE TABLE `grossisteenligne` (
+  `productId` varchar(35) NOT NULL,
   `Name` varchar(255) NOT NULL,
   `link` varchar(600) NOT NULL,
   `image` varchar(600) NOT NULL,
@@ -39,7 +39,10 @@ CREATE TABLE `grossiste` (
   `brand` varchar(50) DEFAULT NULL,
   `category` varchar(150) DEFAULT NULL,
   `quantity` int(10) DEFAULT NULL,
-  `update_time` varchar(50) DEFAULT NULL
+  `update_time` varchar(50) DEFAULT NULL,
+  `parent_id` varchar(50) NOT NULL,
+  `color_name` varchar(25) NOT NULL,
+  `size_name` varchar(5) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -47,9 +50,9 @@ CREATE TABLE `grossiste` (
 --
 
 --
--- Index pour la table `grossiste`
+-- Index pour la table `grossisteenligne`
 --
-ALTER TABLE `grossiste`
+ALTER TABLE `grossisteenligne`
   ADD PRIMARY KEY (`productId`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

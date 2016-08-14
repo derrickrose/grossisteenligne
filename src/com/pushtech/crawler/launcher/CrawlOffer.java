@@ -29,7 +29,10 @@ public class CrawlOffer {
       } catch (Exception e1) {
          logger.error(e1.getMessage() + " on " + page.getUrl());
       }
+      logger.debug("Product id : " + productId);
+
       product.setId(productId);
+      product.setParentId(productId);
       String name = null;
       try {
          name = getName(productPageDocument);
@@ -109,7 +112,7 @@ public class CrawlOffer {
       final Element productIdElement = productPageDocument.select(Selectors.PRODUCT_IDENTIFIER).first();
       String productIdRaw = null;
       if (productIdElement != null) {
-         productIdRaw = productIdElement.text();
+         productIdRaw = productIdElement.attr("productid");
       }
       return productIdRaw;
    }

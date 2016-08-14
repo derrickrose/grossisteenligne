@@ -9,7 +9,7 @@ public class Selectors {
    public static final String PRODUCT_DESCRIPTION = "meta[name=Description]";
    public static final String PRODUCT_BRAND = "";
    public static final String PRODUCT_KEYWORDS = "meta[name=keywords]";
-   public static final String PRODUCT_IDENTIFIER = "span.sku";
+   public static final String PRODUCT_IDENTIFIER = ".item_submit_button";
    public static final String PRODUCT_CATEGORY = ".crumb0>a";// listing
    public static final String PRODUCT_IMAGE = ".slide > img";
    public static final String PRODUCT_PRICE = "#articlePrice.price >span > span#price";

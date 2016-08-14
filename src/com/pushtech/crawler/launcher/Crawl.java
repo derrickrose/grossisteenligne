@@ -83,12 +83,13 @@ public class Crawl {
    private void offerCrawling(Page page, String productPath) {
       Product product = new CrawlOffer().doAction(page);
       System.out.println("Link : " + productPath);
-      String productId = product.getId();
-      logger.debug("Product Id : " + productId);
-      product.setId(productId);
+      // String productId = product.getId();
+      // logger.debug("Product Id : " + productId);
+      // product.setId(productId);
+      // logger.debug("Parent Id : " + product.getParentId());
 
       product.setLink(productPath);
-      product.setId(productId);
+      // product.setId(productId);
       for (Product p : getVariantes(page.getDoc(), product)) {
          DAOFactory daoFactory = new DataBaseDAO().getFactoryInstance();
          AbstractDAOEntity daoEntity = new ProductDAO(daoFactory);
@@ -103,11 +104,26 @@ public class Crawl {
       if (lists.size() > 0) {
          for (Element productElement : lists) {
             Product variantProduct = new Product();
+            String colorName = null;
             String strVariantSize = productElement.text();
+
+            if (strVariantSize.contains(":")) {
+               colorName = strVariantSize.substring(0, strVariantSize.indexOf(":")).trim();
+               variantProduct.setColorName(colorName);
+            }
+
+            if (strVariantSize.contains("Taille")) {
+               strVariantSize = strVariantSize.substring(strVariantSize.indexOf("Taille") + "Taille".length()).trim();
+            }
+
+            logger.debug("Color name : " + colorName);
             System.out.println("Variant size Name :" + strVariantSize);
-            variantProduct.setBrand(strVariantSize);
+            variantProduct.setBrand(p.getBrand());
             variantProduct.setName(p.getName());
             variantProduct.setId(p.getId() + "-" + strVariantSize);
+
+            logger.debug("Product id : " + variantProduct.getId());
+            logger.debug("Product parent id : " + variantProduct.getParentId());
             variantProduct.setDescription(p.getDescription());
             variantProduct.setKeyWord(p.getKeyWord());
             variantProduct.setPrice(p.getPrice());
@@ -118,6 +134,7 @@ public class Crawl {
             variantProduct.setImage(p.getImage());
             variantProduct.setUpdated(p.getUpdated());
             variantProduct.setLink(p.getLink());
+            variantProduct.setSizeName(strVariantSize);
             products.add(variantProduct);
 
          }
