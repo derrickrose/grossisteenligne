@@ -103,7 +103,7 @@ public class Crawl {
       System.out.println("Variante size list:" + lists.size());
       if (lists.size() > 0) {
          for (Element productElement : lists) {
-            Product variantProduct = new Product();
+            Product variantProduct = (Product) p.clone();
             String colorName = null;
             String strVariantSize = productElement.text();
 
