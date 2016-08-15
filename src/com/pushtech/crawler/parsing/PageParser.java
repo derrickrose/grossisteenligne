@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
+import liquibase.util.StreamUtil;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -14,8 +16,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import com.pushtech.crawler.beans.Page;
-
-import liquibase.util.StreamUtil;
 
 public class PageParser implements ParsingTemplate {
 
@@ -69,7 +69,7 @@ public class PageParser implements ParsingTemplate {
       String START_KEY_WORD = "#productsList";
       String END_KEY_WORD = "img.lazy";
       content = content.replace("\\'", "'").replace("\n", " ").replace("\\n", " ").replace("\\\"", "\"").replace("\\/", "/");
-      if (content.contains(START_KEY_WORD)) {
+      if (content.contains(START_KEY_WORD) && content.contains(END_KEY_WORD)) {
          content = content.substring(content.indexOf(START_KEY_WORD), content.indexOf(END_KEY_WORD));
          content = content.substring(content.indexOf("<"), content.lastIndexOf(">") + 1);
       }

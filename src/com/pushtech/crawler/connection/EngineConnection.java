@@ -29,7 +29,9 @@ public class EngineConnection {
    }
 
    public DefaultHttpClient getHttpClient() {
-      if (httpClient == null) httpClient = createClient();
+      if (httpClient == null) {
+         httpClient = createClient();
+      }
       return httpClient;
    }
 
