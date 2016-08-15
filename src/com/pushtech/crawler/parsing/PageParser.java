@@ -58,14 +58,26 @@ public class PageParser implements ParsingTemplate {
          if (encoding.contains("gzip")) {
             InputStreamReader reader = new InputStreamReader(new GzipDecompressingEntity(response.getEntity()).getContent(), "iso-8859-1");
             String content = StreamUtil.getReaderContents(reader);
-            return StringUtils.trim(content);
+            return StringUtils.trim(validateContent(content));
+
          }
       }
-      return StringUtils.trim(EntityUtils.toString(response.getEntity(), "utf-8"));
+      return StringUtils.trim(validateContent(EntityUtils.toString(response.getEntity(), "utf-8")));
+   }
+
+   private String validateContent(String content) {
+      String START_KEY_WORD = "#productsList";
+      String END_KEY_WORD = "img.lazy";
+      content = content.replace("\\'", "'").replace("\n", " ").replace("\\n", " ").replace("\\\"", "\"").replace("\\/", "/");
+      if (content.contains(START_KEY_WORD)) {
+         content = content.substring(content.indexOf(START_KEY_WORD), content.indexOf(END_KEY_WORD));
+         content = content.substring(content.indexOf("<"), content.lastIndexOf(">") + 1);
+      }
+      return content;
    }
 
    private Document getDocument(String content) {
-      return Jsoup.parse(content);
+      return Jsoup.parse(validateContent(content));
    }
 
    @Override

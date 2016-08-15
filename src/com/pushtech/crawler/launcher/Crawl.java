@@ -32,6 +32,8 @@ public class Crawl {
       String urlToConnect = entryPointUrl;
       try {
          page = getPageFromUrl(urlToConnect, EngineContext.MethodType.GET_METHOD);
+         logger.warn("=====>" + page.getContent());
+
          if (PageType.isProductPage(page)) {
             offerCrawling(page, urlToConnect);
          } else if (PageType.isListingPage(page)) {
@@ -68,8 +70,8 @@ public class Crawl {
       HashMap<String, String> headers = new HashMap<String, String>();
 
       headers.put("Host", "www.grossiste-en-ligne.com");
-      headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0");
-      headers.put("Referer", "http://www.grossiste-en-ligne.com/");
+      headers.put("User-Agent", "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)");
+      // headers.put("Referer", "http://www.grossiste-en-ligne.com/");
 
       response = ConnectionHandler.getResponse(url, null, headers, methodeType);
       page = (Page) ParserFactory.getAppropriateParsingTemplate(response).parse(url, response, null);
