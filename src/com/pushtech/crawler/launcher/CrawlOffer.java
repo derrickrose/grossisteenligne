@@ -267,6 +267,7 @@ public class CrawlOffer {
 
    private int getShippingDelay(final String delayRaw) {// TODO
       if (StringUtils.isNotBlank(delayRaw)) {
+         if (StringUtils.equalsIgnoreCase(delayRaw, "0")) return Integer.getInteger(delayRaw);
          String lcRawDelivery = StringUtils.lowerCase(delayRaw);
          lcRawDelivery = StringUtils.substringBeforeLast(delayRaw, ",");
          Pattern p = Pattern.compile("(\\d+)\\sjour");
@@ -284,7 +285,7 @@ public class CrawlOffer {
    private String getShippingDelayRaw(final Element element) {
       Element shippingDelayElement = findElement(element, Selectors.PRODUCT_DELIVERY);
       if (shippingDelayElement != null) return "0";
-      shippingDelayElement = findElement(element, "strong.inStock");
+      shippingDelayElement = findElement(element, "strong.inStock+strong");
       String shippingDelayRaw = fromElementText(shippingDelayElement);
       shippingDelayRaw = validateField(shippingDelayRaw, "Raw delivery", 1);
       return shippingDelayRaw;

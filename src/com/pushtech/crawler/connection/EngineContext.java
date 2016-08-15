@@ -49,6 +49,7 @@ public class EngineContext {
       if (headers != null) {
          request.addHeader("Cookie", headers.get("Cookie"));
          request.addHeader("Host", headers.get("Host"));
+         request.addHeader("Referer", headers.get("Referer"));
       }
       return request;
    }

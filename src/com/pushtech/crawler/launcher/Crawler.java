@@ -10,7 +10,7 @@ public class Crawler extends Thread {
    public void run() {
       String linkToCrawl = FormHandler.getForm().getLinkToCrawl();
       if (StringUtils.isBlank(linkToCrawl)) {
-         linkToCrawl = "http://www.grossiste-en-ligne.com/vetement-femme/";
+         linkToCrawl = "http://www.grossiste-en-ligne.com/";
       }
       // new TreatCrawl(linkToCrawl);
 

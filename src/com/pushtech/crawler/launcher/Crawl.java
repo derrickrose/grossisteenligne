@@ -20,10 +20,6 @@ import com.pushtech.crawler.beans.Page;
 import com.pushtech.crawler.connection.ConnectionHandler;
 import com.pushtech.crawler.connection.EngineContext;
 import com.pushtech.crawler.parsing.ParserFactory;
-import com.pushtech.crawler.serialization.AbstractDAOEntity;
-import com.pushtech.crawler.serialization.DAOFactory;
-import com.pushtech.crawler.serialization.DataBaseDAO;
-import com.pushtech.crawler.serialization.ProductDAO;
 
 /**
  * Created by Workdev on 10/06/2016.
@@ -73,6 +69,7 @@ public class Crawl {
 
       headers.put("Host", "www.grossiste-en-ligne.com");
       headers.put("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0");
+      headers.put("Referer", "http://www.grossiste-en-ligne.com/");
 
       response = ConnectionHandler.getResponse(url, null, headers, methodeType);
       page = (Page) ParserFactory.getAppropriateParsingTemplate(response).parse(url, response, null);
@@ -90,11 +87,11 @@ public class Crawl {
 
       product.setLink(productPath);
       // product.setId(productId);
-      for (Product p : getVariantes(page.getDoc(), product)) {
-         DAOFactory daoFactory = new DataBaseDAO().getFactoryInstance();
-         AbstractDAOEntity daoEntity = new ProductDAO(daoFactory);
-         daoEntity.updateEntity(p);
-      }
+      // for (Product p : getVariantes(page.getDoc(), product)) {
+      // DAOFactory daoFactory = new DataBaseDAO().getFactoryInstance();
+      // AbstractDAOEntity daoEntity = new ProductDAO(daoFactory);
+      // daoEntity.updateEntity(p);
+      // }
    }
 
    private List<Product> getVariantes(Document docProduct, Product p) {
