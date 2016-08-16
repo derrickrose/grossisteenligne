@@ -180,10 +180,10 @@ public class Crawl {
    private void listingCrawling(Page firstListingPage) {
       Page page = firstListingPage;
       listingProcess(page);
-      // for (String nextPageLink : urls(page.getDoc())) {
-      // page = getPageFromUrl(nextPageLink, EngineContext.MethodType.GET_METHOD);
-      // listingProcess(page);
-      // }
+      for (String nextPageLink : urls(page.getDoc())) {
+         page = getPageFromUrl(nextPageLink, EngineContext.MethodType.GET_METHOD);
+         listingProcess(page);
+      }
    }
 
    List<String> urls(Document productDoc) {
