@@ -18,8 +18,8 @@ public class EngineConnection {
    // TODO set proxy , set time out , set cookie policy
 
    private static DefaultHttpClient httpClient = null;
-   private String proxy = "10.10.12.42";
-   private int proxyPort = 3129;
+   private String proxy = null;
+   private int proxyPort = 0;
    private int timeOut = 70000;
    private int soTimeOut = 60000;
 
